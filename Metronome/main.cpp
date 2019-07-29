@@ -84,7 +84,7 @@ incorrectnumber:
 void metronome(float bmp) {
 	std::cout << "I play " << bmp << " BMP.\nPress enter and I will stop";
 	std::cin.ignore();
-	unsigned nanobmp = floor(6.0 * 10000000000 / bmp);
+	long long nanobmp = floor(60000000000.0/ bmp);
 	WaitForEnter wait;
 	while (!wait.isFinished())
 	{

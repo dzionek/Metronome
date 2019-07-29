@@ -1,8 +1,31 @@
-#include "iostream"
-#include "cmath"
+#include <iostream>
+#include <cmath>
 #include <thread>
+#include <atomic>
+#include <string>
 
 void metronome(float);
+
+class WaitForEnter
+{
+public:
+	WaitForEnter() : finish(false)
+	{
+		thr = std::thread([this]() {
+			std::string in;
+			std::getline(std::cin, in);
+			finish = true;
+			});
+	}
+	~WaitForEnter()
+	{
+		thr.join();
+	}
+	bool isFinished() const { return finish; }
+private:
+	std::atomic<bool> finish;
+	std::thread thr;
+};
 
 int main() {
 	float f;
@@ -30,6 +53,7 @@ incorrectnumber:
 			goto incorrectnumberbmp;
 		}
 		metronome(bmp);
+		std::system("cls");
 		goto start;
 
 	case 2: std::system("cls");
@@ -58,13 +82,15 @@ incorrectnumber:
 }
 
 void metronome(float bmp) {
-	std::cout << "I play " << bmp << " BMP.\n";
-	unsigned nanobmp = floor(6 * 10000000000 / bmp);
-	while (std::cin.get() != 'a') {
-		std::cout << "x '\a";
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+	std::cout << "I play " << bmp << " BMP.\nPress enter and I will stop";
+	std::cin.ignore();
+	unsigned nanobmp = floor(6.0 * 10000000000 / bmp);
+	WaitForEnter wait;
+	while (!wait.isFinished())
+	{
+		std::cout << "\a";
+		std::this_thread::sleep_for(std::chrono::nanoseconds(nanobmp));
 	}
-	std::cout << "Press enter to back to menu.\n";
-	std::cin.get();
+	std::cout << "\nOK, that was enough.\nPress enter to back to menu.\n";
 	std::cin.get();
 }
